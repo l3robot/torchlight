@@ -7,9 +7,9 @@ from torch.autograd import Variable
 
 from .utils import EarlyStopping
 
-    
+
 class BaseTrainer():
-    
+
     def __init__(self, model, optimizer, **kwargs):
         self.model = model
         self.optimizer = optimizer
@@ -20,15 +20,16 @@ class BaseTrainer():
         self.simulate_mini_batch = kwargs.get('simulate_mini_batch', False)
 
     ## deccorator functions
+    @staticmethod
     def isolate_model_mode(validate):
         def new_fct(fct):
             def wrapper(*args, **kwargs):
                 model = args[0].model
                 last_mode = model.training
-                model.eval() if validate is True else model.train()
+                __ = model.eval() if validate else model.train()
                 out = fct(*args, **kwargs)
-                model.train() if last_mode is True else model.eval()
-                return out 
+                __ = model.train() if last_mode else model.eval()
+                return out
             return wrapper
         return new_fct
 
@@ -62,7 +63,7 @@ class BaseTrainer():
 
     def __all_batch(self, dataloader, validate):
         batch_losses = []
-        for i_batch, batch in enumerate(dataloader):
+        for batch in dataloader:
             loss = self.__one_batch(batch, validate)
             batch_losses.append(loss)
         # print(np.mean(batch_losses))
@@ -101,17 +102,8 @@ class BaseTrainer():
 
 class BaseClassificationTrainer(BaseTrainer):
 
-    def __init__(self, model, optimizer, **kwargs):
-        super().__init__(model, optimizer, **kwargs)
-
     def loss_inference(self, inputs, targets):
         criterion = nn.CrossEntropyLoss()
-        outputs = model(inputs)
+        outputs = self.model(inputs)
         loss = criterion(outputs, targets)
         return loss
-
-
-
-
-
-
