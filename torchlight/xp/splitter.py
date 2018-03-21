@@ -15,6 +15,7 @@ def idx_splitter(size, prop, random_state=42):
 
 
 def train_test_splitter(dataset, train_prop=0.8, random_state=42):
+    print(dataset.__dict__)
     ## chossing the idx
     train_idx, test_idx = idx_splitter(len(dataset), train_prop, random_state)    
     ## train dataset

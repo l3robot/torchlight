@@ -1,4 +1,4 @@
-from .evaluation import *
+from .testing import *
 from .io import *
 from .modules import *
 from .training import *

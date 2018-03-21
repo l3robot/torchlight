@@ -45,11 +45,11 @@ class BaseTrainer():
         self.optimizer.step()
         return loss
 
-    def __fcuda(self, *tensors):
+    def __fcuda(self, tensors):
         return [T.cuda() if self.cuda else T for T in tensors]
 
     def __one_batch(self, batch, validate):
-        inputs, targets = self.__fcuda(*batch)
+        inputs, targets = self.__fcuda(batch)
         if validate:
             inputs = Variable(inputs, volatile=True)
             targets = Variable(targets, volatile=True)
@@ -65,7 +65,6 @@ class BaseTrainer():
         for batch in dataloader:
             loss = self.__one_batch(batch, validate)
             batch_losses.append(loss)
-        # print(np.mean(batch_losses))
         return np.mean(batch_losses)
 
     @isolate_model_mode(validate=True)
@@ -88,8 +87,8 @@ class BaseTrainer():
             train_losses.append(train_loss)
             valid_losses.append(valid_loss)
             if self.verbose:
-                print(' [-]: epoch {}, train loss: {}, valid loss: {}'.format(
-                    i_epoch+1, train_loss, valid_loss))
+                print(' [-]: epoch {}, train loss: {:.4f}, valid loss: {:.4f}'\
+                    .format(i_epoch+1, train_loss, valid_loss))
             stop = early_stopper.stopping(i_epoch, valid_loss, self.model.state_dict())
             if stop and early_stopping:
                 if self.verbose:
