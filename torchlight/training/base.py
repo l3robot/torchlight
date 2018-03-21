@@ -20,7 +20,6 @@ class BaseTrainer():
         self.simulate_mini_batch = kwargs.get('simulate_mini_batch', False)
 
     ## deccorator functions
-    @staticmethod
     def isolate_model_mode(validate):
         def new_fct(fct):
             def wrapper(*args, **kwargs):
