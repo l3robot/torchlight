@@ -6,7 +6,7 @@ import torch
 import torchvision
 
 from .context import torchlight
-from torchlight.xp import idx_splitter, train_test_splitter
+from torchlight.xp import idx_splitter, mnist_train_test_splitter
 
 
 class TestBasicSplitters(unittest.TestCase):
@@ -17,13 +17,13 @@ class TestBasicSplitters(unittest.TestCase):
         ## mnist test init
         proportion = 0.8
         self.mnist = torchvision.datasets.MNIST(download=True, train=True, root=mnist_path)
-        self.mnist_train, self.mnist_test = train_test_splitter(self.mnist, proportion)
+        self.mnist_train, self.mnist_test = mnist_train_test_splitter(self.mnist, proportion)
         self.mnist_train_size = math.floor(proportion * len(self.mnist))
         self.mnist_test_size = len(self.mnist) - self.mnist_train_size
         # cifar test init
         proportion = 0.9
         self.cifar10 = torchvision.datasets.CIFAR10(download=True, train=True, root=cifar10_path)
-        self.cifar10_train, self.cifar10_test = train_test_splitter(self.cifar10, proportion)
+        self.cifar10_train, self.cifar10_test = mnist_train_test_splitter(self.cifar10, proportion)
         self.cifar10_train_size = math.floor(proportion * len(self.cifar10))
         self.cifar10_test_size = len(self.cifar10) - self.cifar10_train_size
         ## test

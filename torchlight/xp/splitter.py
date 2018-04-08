@@ -14,8 +14,19 @@ def idx_splitter(size, prop, random_state=42):
     return fold1_idx, fold2_idx
 
 
-def train_test_splitter(dataset, train_prop=0.8, random_state=42):
-    print(dataset.__dict__)
+def folder_train_test_splitter(folderDataset, train_prop=0.8, random_state=42):
+    ## chossing the idx
+    train_idx, test_idx = idx_splitter(len(dataset), train_prop, random_state)    
+    ## train dataset
+    train_dataset = copy.deepcopy(dataset)
+    train_dataset.imgs = train_dataset.imgs[train_idx]
+    ## test dataset
+    test_dataset = copy.deepcopy(dataset)
+    test_dataset.imgs = test_dataset.imgs[test_idx]
+    return train_dataset, test_dataset    
+
+
+def mnist_train_test_splitter(dataset, train_prop=0.8, random_state=42):
     ## chossing the idx
     train_idx, test_idx = idx_splitter(len(dataset), train_prop, random_state)    
     ## train dataset
