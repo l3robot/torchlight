@@ -1,5 +1,3 @@
-import abc
-
 import numpy as np
 
 import torch.nn as nn
@@ -19,7 +17,7 @@ class BaseTrainer():
         self.verbose = kwargs.get('verbose', False)
         self.simulate_mini_batch = kwargs.get('simulate_mini_batch', False)
 
-    ## deccorator functions
+    ## decorator functions
     def isolate_model_mode(validate):
         def new_fct(fct):
             def wrapper(*args, **kwargs):
@@ -32,12 +30,10 @@ class BaseTrainer():
             return wrapper
         return new_fct
 
-    ## abstract functions
-    @abc.abstractmethod
-    def loss_inference(self, inputs, targets):
-        return
-
     ## private functions
+    def __loss_inference(self, inputs, targets):
+        return self.model(inputs, targets)
+
     def __update_step(self, inputs, targets):
         self.optimizer.zero_grad()
         loss = self.loss_inference(inputs, targets)
@@ -96,12 +92,3 @@ class BaseTrainer():
                 break
         self.model.load_state_dict(early_stopper.best_weights)
         return train_losses, valid_losses, early_stopper
-
-
-class BaseClassificationTrainer(BaseTrainer):
-
-    def loss_inference(self, inputs, targets):
-        criterion = nn.CrossEntropyLoss()
-        outputs = self.model(inputs)
-        loss = criterion(outputs, targets)
-        return loss
