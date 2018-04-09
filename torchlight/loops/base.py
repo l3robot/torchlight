@@ -1,21 +1,12 @@
 import numpy as np
 
-import torch.nn as nn
 from torch.autograd import Variable
 
-from .utils import EarlyStopping
 
+class BaseLoop():
 
-class BaseTrainer():
-
-    def __init__(self, model, optimizer, **kwargs):
-        self.model = model
-        self.optimizer = optimizer
-        ## kwargs assignations
-        self.patience = kwargs.get('patience', 5)
-        self.cuda = kwargs.get('cuda', False)
-        self.verbose = kwargs.get('verbose', False)
-        self.simulate_mini_batch = kwargs.get('simulate_mini_batch', False)
+    def __init__(self):
+        self.metrics = []
 
     ## decorator functions
     def isolate_model_mode(validate):
@@ -31,8 +22,8 @@ class BaseTrainer():
         return new_fct
 
     ## private functions
-    def __loss_inference(self, inputs, targets):
-        return self.model(inputs, targets)
+    def __fcuda(self, tensors):
+        return [T.cuda() if self.cuda else T for T in tensors]
 
     def __update_step(self, inputs, targets):
         self.optimizer.zero_grad()
@@ -40,9 +31,6 @@ class BaseTrainer():
         loss.backward()
         self.optimizer.step()
         return loss
-
-    def __fcuda(self, tensors):
-        return [T.cuda() if self.cuda else T for T in tensors]
 
     def __one_batch(self, batch, validate):
         inputs, targets = self.__fcuda(batch)
@@ -74,21 +62,27 @@ class BaseTrainer():
         return train_loss
 
     ## public functions
-    def train(self, trainloader, validloader, nb_epochs, early_stopping=False):
-        train_losses, valid_losses = [], []
-        early_stopper = EarlyStopping(self.patience)
-        for i_epoch in range(nb_epochs):
-            train_loss = self.__train_one_epoch(trainloader)
-            valid_loss = self.__validate_one_epoch(validloader)
-            train_losses.append(train_loss)
-            valid_losses.append(valid_loss)
-            if self.verbose:
-                print(' [-]: epoch {}, train loss: {:.4f}, valid loss: {:.4f}'\
-                    .format(i_epoch+1, train_loss, valid_loss))
-            stop = early_stopper.stopping(i_epoch, valid_loss, self.model.state_dict())
-            if stop and early_stopping:
-                if self.verbose:
-                    print(' [-]: early stopping at epoch {}'.format(i_epoch+1))
-                break
-        self.model.load_state_dict(early_stopper.best_weights)
-        return train_losses, valid_losses, early_stopper
+    def loss_inference(self, inputs, targets):
+        preds = self.model(inputs)
+        for metric in self.metrics:
+            metric.append(preds, targets)
+        return self.model.loss(preds, targets)
+
+    def register_metric(self, metric):
+        self.metrics.append(metric)
+
+    def compute_metrics(self):
+        computed_metrics = {}
+        for metric in self.metrics:
+            computed_metrics[metric.name] = metric.compute()
+        return computed_metrics
+
+    def show_metrics(self):
+        metric_str = []
+        for metric in self.metrics:
+            metric_str.append(metric.show())
+        return ', '.join(metric_str)
+
+    def reset_metrics(self):
+        for metric in self.metrics:
+            metric.reset()

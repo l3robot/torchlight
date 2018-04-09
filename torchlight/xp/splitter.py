@@ -16,13 +16,13 @@ def idx_splitter(size, prop, random_state=42):
 
 def folder_train_test_splitter(folderDataset, train_prop=0.8, random_state=42):
     ## chossing the idx
-    train_idx, test_idx = idx_splitter(len(dataset), train_prop, random_state)    
+    train_idx, test_idx = idx_splitter(len(folderDataset), train_prop, random_state)    
     ## train dataset
-    train_dataset = copy.deepcopy(dataset)
-    train_dataset.imgs = train_dataset.imgs[train_idx]
+    train_dataset = copy.deepcopy(folderDataset)
+    train_dataset.imgs = [train_dataset.imgs[i] for i in train_idx]
     ## test dataset
-    test_dataset = copy.deepcopy(dataset)
-    test_dataset.imgs = test_dataset.imgs[test_idx]
+    test_dataset = copy.deepcopy(folderDataset)
+    test_dataset.imgs = [test_dataset.imgs[i] for i in test_idx]
     return train_dataset, test_dataset    
 
 

@@ -1,5 +1,4 @@
-from .testing import *
 from .io import *
 from .modules import *
-from .training import *
+from .loops import *
 from .xp import *
