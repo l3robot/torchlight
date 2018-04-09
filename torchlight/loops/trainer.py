@@ -18,7 +18,6 @@ class BaseTrainerLoop(BaseLoop):
 
     ## public functions
     def train(self, trainloader, validloader, nb_epochs, early_stopping=False):
-        self.show_metrics()
         train_losses, valid_losses = [], []
         early_stopper = EarlyStopping(self.patience)
         for i_epoch in range(nb_epochs):
@@ -27,7 +26,7 @@ class BaseTrainerLoop(BaseLoop):
             train_losses.append(train_loss)
             valid_losses.append(valid_loss)
             if self.verbose:
-                print(' [-]: epoch {}, train loss: {:.4f}, valid loss: {:.4f}'\
+                print(' [-]: epoch {}, train loss: {:.4f}, valid loss: {:.4f}, {}'\
                     .format(i_epoch+1, train_loss, valid_loss, self.show_metrics()))
             stop = early_stopper.stopping(i_epoch, valid_loss, self.model.state_dict())
             if stop and early_stopping:

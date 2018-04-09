@@ -12,7 +12,7 @@ class BaseMetric():
 
     def append(self, preds, targets):
         self.preds.extend(preds.data.cpu().numpy())
-        self.targets.extend(preds.data.cpu().numpy())
+        self.targets.extend(targets.data.cpu().numpy())
 
     @abc.abstractmethod
     def compute(self):
@@ -30,4 +30,4 @@ class AccuracyScore(BaseMetric):
 
     def compute(self):
         preds = np.argmax(self.preds, axis=1)
-        return accuracy_score(preds, targets)
+        return accuracy_score(preds, self.targets)
