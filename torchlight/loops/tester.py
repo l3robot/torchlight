@@ -20,4 +20,4 @@ class BaseTesterLoop(BaseLoop):
     def test(self, testloader):
         loss = self._BaseLoop__all_batch(testloader, validate=True)
         metrics = self.compute_metrics()
-        return (loss, metrics)
+        return loss, metrics

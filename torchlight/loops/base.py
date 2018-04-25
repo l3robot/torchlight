@@ -53,11 +53,13 @@ class BaseLoop():
 
     @isolate_model_mode(validate=True)
     def __validate_one_epoch(self, validloader):
+        self.reset_metrics()
         valid_loss = self.__all_batch(validloader, validate=True)
         return valid_loss
 
     @isolate_model_mode(validate=False)
     def __train_one_epoch(self, trainloader):
+        self.reset_metrics()
         train_loss = self.__all_batch(trainloader, validate=False)
         return train_loss
 

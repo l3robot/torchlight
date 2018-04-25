@@ -14,12 +14,16 @@ class BaseMetric():
         self.preds.extend(preds.data.cpu().numpy())
         self.targets.extend(targets.data.cpu().numpy())
 
-    @abc.abstractmethod
-    def compute(self):
-        raise NotImplementedError
+    def reset(self):
+        self.preds = []
+        self.targets = []
 
     def show(self):
         return '{}: {:.4f}'.format(self.name, self.compute())
+
+    @abc.abstractmethod
+    def compute(self):
+        raise NotImplementedError
 
 
 class AccuracyScore(BaseMetric):
